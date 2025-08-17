@@ -1,58 +1,43 @@
-# Cloudflare SSL Setup Guide
+# Cloudflare SSL Configuration
 
-## Current Setup Options
+## Our Implementation: Full End-to-End Encryption
 
-### Option 1: Cloudflare Only (NOT RECOMMENDED)
-- Browser → Cloudflare: HTTPS ✅
-- Cloudflare → Server: HTTP ❌
-- **Risk**: Unencrypted data between Cloudflare and server
+We use **Cloudflare Full (strict) SSL mode** with **Let's Encrypt certificates** on the server for complete end-to-end encryption:
 
-### Option 2: Full End-to-End Encryption (RECOMMENDED)
-- Browser → Cloudflare: HTTPS ✅  
-- Cloudflare → Server: HTTPS ✅
-- **Benefit**: Complete security
+- **Browser ↔ Cloudflare**: HTTPS ✅  
+- **Cloudflare ↔ Server**: HTTPS ✅ (verified with valid Let's Encrypt certificate)
 
-## Easy Setup: Cloudflare Origin Certificate
+## Configuration Steps
 
-### Steps:
+### 1. Cloudflare Settings
+- **SSL/TLS Mode**: Full (strict)
+- **Proxy Status**: Enabled (orange cloud)
+- **Domains**: safronov.nl, www.safronov.nl, api.safronov.nl
 
-1. **In Cloudflare Dashboard**:
-   - Go to SSL/TLS → Origin Server
-   - Click "Create Certificate"
-   - Select RSA (2048)
-   - Add domains: safronov.nl, www.safronov.nl
-   - Set validity: 15 years
-   - Download certificate files
+### 2. Server Certificate
+- **Provider**: Let's Encrypt
+- **Certificates**: Valid SSL certificates for all domains
+- **Renewal**: Automatic (every 90 days)
 
-2. **Set SSL Mode**:
-   - Go to SSL/TLS → Overview
-   - Set to "Full (strict)"
+### 3. Nginx Configuration
+- **HTTPS**: Port 443 with SSL certificates
+- **HTTP Redirect**: All HTTP traffic redirected to HTTPS
+- **Security Headers**: HSTS, X-Frame-Options, etc.
 
-3. **Server Configuration**:
-   - Install the Origin Certificate on server
-   - Configure Nginx for HTTPS
+## Live Endpoints
 
-## Alternative: Skip Server SSL (Simpler)
+- **Main API**: https://safronov.nl/api
+- **WWW**: https://www.safronov.nl/api
+- **API Subdomain**: https://api.safronov.nl/api
+- **Health Check**: https://safronov.nl/health
 
-If you prefer simplicity:
+## Benefits
 
-1. **In Cloudflare Dashboard**:
-   - Set SSL mode to "Full" (not strict)
-   - Keep server on HTTP only
+✅ **Complete Security**: Full encryption from browser to server  
+✅ **Performance**: Cloudflare CDN and HTTP/2  
+✅ **DDoS Protection**: Cloudflare's security features  
+✅ **Automatic Renewal**: No manual certificate management  
 
-2. **Benefits**:
-   - ✅ Users get HTTPS (encrypted to Cloudflare)
-   - ✅ Simple server setup
-   - ✅ Cloudflare handles SSL complexity
+---
 
-3. **Trade-offs**:
-   - ⚠️ Server-to-Cloudflare not encrypted
-   - ⚠️ Less secure for sensitive data
-
-## Current Server Status
-
-Your API is accessible at:
-- http://safronov.nl/api (via Cloudflare)
-- https://safronov.nl/api (via Cloudflare SSL)
-
-Cloudflare automatically provides HTTPS for visitors!
+*Note: Alternative approaches like Cloudflare Origin certificates or HTTP-only setups were considered but not implemented for security reasons.*
